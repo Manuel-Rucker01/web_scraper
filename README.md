@@ -1,5 +1,5 @@
-# web_scraper
-This repo holds a hybrid web scraper that uses rules or LLMs to extract certain information about different events via its url. It generates a CSV file with the structured scrapped information.
+# web_scrapper
+This repo holds a hybrid web scrapper that uses rules or LLMs to extract certain information about different events via its url. It generates a CSV file with the structured scrapped information.
 
 # Recolector de listados
 
@@ -44,6 +44,23 @@ tu ordenador o en un servidor tuyo.
 
 ---
 
+## Cómo dar la página
+
+Dos formas de pasarle la página a la app:
+
+- **Fetch a URL** — le das la dirección y ella descarga la página de listado y
+  las fichas que enlaza. Es lo normal para webs públicas.
+- **Paste HTML** — pegas el HTML de la página (clic derecho → *Inspeccionar*,
+  copias el elemento `<html>`, o usas *Ver código fuente*). Útil cuando la web
+  pide login o carga con JavaScript y la descarga directa no ve el contenido
+  real. Al pegar HTML eliges qué es:
+  - *A single item page* → una sola ficha → una fila (funciona sin internet).
+  - *A list with items on this same page* → todo el listado está en esa página
+    (tarjetas) → una fila por tarjeta.
+  - *A list that links to separate item pages* → un listado que enlaza a fichas
+    → sigue esos enlaces y los recorre (necesita internet y la URL original
+    para resolver los enlaces relativos).
+
 ## Cómo usarla en tu ordenador
 
 1. Instala Python 3.10 o superior.
@@ -84,16 +101,20 @@ La clave gratuita se saca en <https://aistudio.google.com/app/apikey>.
 ## Notas para desarrollo
 
 - `scraper.py` — toda la lógica (descarga, detección de fichas, extracción
-  por reglas y por Gemini). No depende de Streamlit, así que se puede probar
-  o reutilizar suelto.
-- `app.py` — solo la interfaz.
-- El motor por reglas rellena bien: nombre, descripción, imagen, web,
-  LinkedIn, email, fecha/año y ubicación en webs con plantilla. Los campos sin
-  etiqueta clara (p. ej. categoría) son más difíciles: ahí Gemini acierta más.
+  por reglas y por Gemini/Ollama). No depende de Streamlit.
+- `app.py` — solo la interfaz (en inglés).
+- El motor por reglas rellena: nombre, categoría, descripción, imagen, web,
+  LinkedIn de la empresa, **fundadores** (a partir de los LinkedIn personales),
+  email, fecha/año y ubicación.
+- **Los motores de IA (Gemini/Ollama) ahora *enriquecen* el resultado de las
+  reglas, no lo sustituyen.** Las reglas aportan los campos estructurados
+  (enlaces, imagen, fechas, fundadores) y la IA solo reescribe los campos de
+  texto (descripción, categoría, ubicación). Así la IA nunca borra una web o
+  una imagen que las reglas sí encontraron. Además hay reintentos con espera
+  por si la API responde con límite de peticiones (rate limit).
 - Para enseñarle etiquetas nuevas al motor por reglas, amplía los diccionarios
   `_LABELS` en `scraper.py`.
-- v1 cubre el patrón "página de listado → fichas". Una sola página que ya
-  contenga todas las tarjetas con los datos sería una mejora futura.
+- v1 cubre el patrón "página de listado → fichas".
 
 ## Sobre el coste de usar un LLM
 
